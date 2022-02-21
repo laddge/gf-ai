@@ -1,8 +1,9 @@
+import os
 import torch
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 
 # 転移学習済みモデル
-MODEL_DIR = "./model"
+MODEL_DIR = os.path.join(os.path.dirname(__file__), "model")
 
 # トークナイザー（SentencePiece）
 tokenizer = T5Tokenizer.from_pretrained(MODEL_DIR, is_fast=True)
