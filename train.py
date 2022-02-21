@@ -99,10 +99,9 @@ class TsvDataset(Dataset):
         with open(self.file_path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip().split("\t")
-                assert len(line) == 3
+                assert len(line) == 2
                 assert len(line[0]) > 0
                 assert len(line[1]) > 0
-                assert len(line[2]) > 0
 
                 say = line[0]
                 reply = line[1]
