@@ -97,7 +97,8 @@ class TsvDataset(Dataset):
 
     def _build(self):
         with open(self.file_path, "r", encoding="utf-8") as f:
-            for line in f:
+            lines = f.readlines()
+            for line in lines:
                 line = line.strip().split("\t")
                 assert len(line) == 2
                 assert len(line[0]) > 0
