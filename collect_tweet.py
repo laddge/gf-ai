@@ -8,7 +8,6 @@ import emoji
 TRAINFILE = "./data/train.tsv"
 DEVFILE = "./data/dev.tsv"
 TESTFILE = "./data/test.tsv"
-MAX_TW = 10000
 
 
 class Tweet:
@@ -50,10 +49,13 @@ def normalize(text):
     # text = re.sub(r"\d+", "0", tmp)
     tmp = re.sub(r"[!-/:-@[-`{-~]", r" ", text)
     text = re.sub(u"[■-♯]", " ", tmp)
+    text = text.strip()
     return text
 
 
 def main():
+    query = input("Search Query: ")
+    max_tw = int(input("Tweet Count: "))
     CK = os.getenv("TW_CK")
     CS = os.getenv("TW_CS")
     auth = tweepy.AppAuthHandler(CK, CS)
@@ -64,10 +66,10 @@ def main():
     lookup_ids = []
     replies = {}
     max_id = None
-    while saved <= MAX_TW:
+    while saved <= max_tw:
         try:
             statuses = api.search_tweets(
-                q="私 filter:replies", lang="ja", count=100, max_id=max_id
+                q=query, lang="ja", count=100, max_id=max_id
             )
             max_id = statuses[-1].id
             for status in statuses:
@@ -97,9 +99,11 @@ def main():
                         intext = normalize(intext)
                         outtext = re.sub(r"@([A-Za-z0-9_]+)", "", reply.text)
                         outtext = normalize(outtext)
-                        if saved <= MAX_TW * .9:
+                        if not intext or not outtext:
+                            continue
+                        if saved <= max_tw * .9:
                             path = TRAINFILE
-                        elif saved <= MAX_TW * .95:
+                        elif saved <= max_tw * .95:
                             path = DEVFILE
                         else:
                             path = TESTFILE
@@ -107,7 +111,7 @@ def main():
                             f.write(f"{intext}\t{outtext}\n")
                         saved += 1
                         print(f"\r{got} => {filtered} => {saved}", end="")
-                        if saved > MAX_TW:
+                        if saved > max_tw:
                             exit()
                     lookup_ids = []
                     replies = {}
