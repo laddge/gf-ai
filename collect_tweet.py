@@ -9,6 +9,17 @@ TRAINFILE = "./data/train.tsv"
 DEVFILE = "./data/dev.tsv"
 TESTFILE = "./data/test.tsv"
 
+dup = []
+if os.path.exists(TRAINFILE):
+    with open(TRAINFILE) as f:
+        dup += f.readlines()
+if os.path.exists(DEVFILE):
+    with open(DEVFILE) as f:
+        dup += f.readlines()
+if os.path.exists(TESTFILE):
+    with open(TESTFILE) as f:
+        dup += f.readlines()
+
 
 class Tweet:
     def __init__(self, status):
@@ -100,6 +111,8 @@ def main():
                         outtext = re.sub(r"@([A-Za-z0-9_]+)", "", reply.text)
                         outtext = normalize(outtext)
                         if not intext or not outtext:
+                            continue
+                        if f"{intext}\t{outtext}\n" in dup:
                             continue
                         if saved <= max_tw * .9:
                             path = TRAINFILE
